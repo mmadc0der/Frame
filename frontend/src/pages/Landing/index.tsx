@@ -4,120 +4,171 @@ import { motion } from 'framer-motion'
 
 const Container = styled.div`
   min-height: 200vh;
-  width: 100%;
-  background-color: ${({ theme }) => theme.colors.background};
   display: flex;
   flex-direction: column;
-  align-items: center;
-  position: relative;
+  overflow-x: hidden;
+  background: ${props => props.theme.colors.background};
 `
 
-const Header = styled.header`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background-color: ${({ theme }) => theme.colors.primary};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  z-index: 1000;
+const Header = styled(motion.header)`
+  position: ${props => props.theme.landingPage.header.position};
+  top: ${props => props.theme.landingPage.header.top};
+  left: ${props => props.theme.landingPage.header.left};
+  width: ${props => props.theme.landingPage.header.width};
+  display: ${props => props.theme.landingPage.header.display};
+  justify-content: ${props => props.theme.landingPage.header.justifyContent};
+  align-items: ${props => props.theme.landingPage.header.alignItems};
+  padding: ${props => props.theme.landingPage.header.padding};
+  background: transparent;
+  z-index: ${props => props.theme.landingPage.header.zIndex};
 `
 
-const Logo = styled.a`
-  color: ${({ theme }) => theme.colors.text};
-  text-decoration: none;
-  font-size: 24px;
+const Logo = styled(motion.a)`
+  font-family: ${props => props.theme.fonts.heading};
+  font-size: 1.5rem;
   font-weight: bold;
+  color: ${props => props.theme.colors.primary};
+  text-decoration: none;
+  cursor: pointer;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.accent};
+    opacity: 0.8;
+    color: ${props => props.theme.colors.primary};
+  }
+
+  &:visited {
+    color: ${props => props.theme.colors.primary};
   }
 `
 
 const LoginButton = styled.button`
-  background-color: transparent;
-  color: ${({ theme }) => theme.colors.text};
-  padding: 8px 16px;
-  font-size: 16px;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  color: ${props => props.theme.colors.primary};
+  font-family: ${props => props.theme.fonts.body};
+  font-size: 1rem;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.accent};
+    opacity: 0.8;
   }
 `
 
-const Content = styled.main`
-  margin-top: 60px;
-  padding: 40px 20px;
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 40px;
-`
-
-const Title = styled(motion.h1)`
-  font-size: 48px;
-  color: ${({ theme }) => theme.colors.text};
-  text-align: center;
-  margin: 0;
-`
-
-const Description = styled(motion.p)`
-  font-size: 24px;
-  color: ${({ theme }) => theme.colors.text};
-  text-align: center;
-  max-width: 800px;
-  margin: 0;
-  opacity: 0;
-`
-
-const Footer = styled(motion.footer)`
+const Content = styled.div`
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  color: ${({ theme }) => theme.colors.text};
-  font-size: 14px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+`
+
+const CenteredText = styled(motion.div)`
+  position: absolute;
+  text-align: center;
+  font-size: 4rem;
+  font-weight: bold;
+  font-family: ${props => props.theme.fonts.heading};
+  color: ${props => props.theme.colors.primary};
+  width: 100%;
+  max-width: 800px;
+  line-height: 1.2;
+  padding: 0 2rem;
+`
+
+const Description = styled(motion.div)`
+  position: absolute;
+  text-align: center;
+  font-size: 2rem;
+  font-family: ${props => props.theme.fonts.body};
+  color: ${props => props.theme.colors.secondary};
+  width: 100%;
+  max-width: 600px;
+  line-height: 1.5;
+  padding: 0 2rem;
+`
+
+const Footer = styled(motion.div)`
+  position: fixed;
+  bottom: 2rem;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: ${props => props.theme.colors.primary};
   opacity: 0.7;
 `
 
 export const Landing = () => {
-  const [scrollY, setScrollY] = useState(0)
+  const [scrollProgress, setScrollProgress] = useState(0)
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY)
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = Math.min(Math.max(window.scrollY / scrollHeight, 0), 1)
+      setScrollProgress(progress)
     }
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    let ticking = false
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', onScroll)
+    handleScroll()
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
     <Container>
-      <Header>
+      <Header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{
+          opacity: scrollProgress > 0.1 ? 1 : 0,
+          y: scrollProgress > 0.1 ? 0 : -20
+        }}
+        transition={{ duration: 0.2 }}
+      >
         <Logo href="/">Frame</Logo>
         <LoginButton>Log In</LoginButton>
       </Header>
 
       <Content>
-        <Title
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+        <CenteredText
+          initial={{ opacity: 1, y: 0 }}
+          animate={{
+            opacity: scrollProgress < 0.3 ? 1 : 0,
+            y: scrollProgress < 0.3 ? 0 : -50
+          }}
+          transition={{
+            duration: 0.2,
+            ease: "easeOut"
+          }}
         >
           Welcome to Frame
-        </Title>
-
+        </CenteredText>
         <Description
-          initial={{ opacity: 0 }}
-          animate={{ opacity: scrollY > window.innerHeight * 0.3 ? 1 : 0 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{
+            opacity: scrollProgress > 0.3 ? 1 : 0,
+            y: scrollProgress > 0.3 ? 0 : 50
+          }}
+          transition={{
+            duration: 0.2,
+            ease: "easeOut"
+          }}
         >
           Your creative space for amazing projects
         </Description>
@@ -125,10 +176,12 @@ export const Landing = () => {
 
       <Footer
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.7 }}
+        animate={{
+          opacity: scrollProgress > 0.3 ? 0.7 : 0
+        }}
         transition={{ duration: 0.2 }}
       >
-       &copy; created by madc0der
+       © created by madc0der
       </Footer>
     </Container>
   )
