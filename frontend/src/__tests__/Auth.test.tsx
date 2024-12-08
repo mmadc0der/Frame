@@ -1,32 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider } from 'styled-components';
-import styled from 'styled-components';
 import { LoginForm } from '../components/auth/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
 import { theme } from '../styles/theme';
-
-const SwitchText = styled.p`
-  text-align: center;
-  margin-top: 1rem;
-  color: ${props => props.theme.colors.primary};
-  font-size: 0.875rem;
-`;
-
-const SwitchLink = styled.button`
-  background: none;
-  border: none;
-  color: ${props => props.theme.colors.accent};
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-  font-size: 0.875rem;
-  text-decoration: underline;
-  
-  &:hover {
-    color: ${props => props.theme.colors.primary};
-  }
-`;
 
 const renderWithTheme = (component: React.ReactElement) => {
   return render(
