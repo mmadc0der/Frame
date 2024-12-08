@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
+import { AuthModal } from '../../components/auth/AuthModal'
 
 const Container = styled.div`
   min-height: 200vh;
@@ -107,6 +108,7 @@ const Footer = styled(motion.div)`
 
 export const Landing = () => {
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -142,7 +144,7 @@ export const Landing = () => {
         transition={{ duration: 0.2 }}
       >
         <Logo href="/">Frame</Logo>
-        <LoginButton>Log In</LoginButton>
+        <LoginButton onClick={() => setIsAuthModalOpen(true)}>Sign Up</LoginButton>
       </Header>
 
       <Content>
@@ -181,8 +183,13 @@ export const Landing = () => {
         }}
         transition={{ duration: 0.2 }}
       >
-       © created by madc0der
+       &copy; created by madc0der
       </Footer>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
     </Container>
   )
 }

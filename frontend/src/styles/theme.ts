@@ -6,7 +6,17 @@ export const theme = {
     secondary: '#424769',
     accent: '#7077A1',
     background: '#F6B17A',
-    text: '#2D3250'
+    text: '#2D3250',
+    modal: {
+      background: '#F8F9FA',
+      input: '#FFFFFF',
+      inputBorder: '#E9ECEF',
+      buttonPrimary: '#2D3250',
+      buttonText: '#FFFFFF',
+      divider: '#DEE2E6',
+      error: '#DC3545',
+      socialButtonText: '#2D3250'
+    }
   },
   fonts: {
     heading: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
@@ -16,6 +26,10 @@ export const theme = {
     mobile: '320px',
     tablet: '768px',
     desktop: '1024px'
+  },
+  zIndex: {
+    modal: 2000,
+    header: 1000
   },
   button: {
     primary: {

@@ -42,7 +42,7 @@ describe('Landing Component', () => {
 
   it('renders login button', () => {
     renderWithTheme(<Landing />);
-    const loginButton = screen.getByText('Log In');
+    const loginButton = screen.getByText('Sign Up');
     expect(loginButton).toBeInTheDocument();
   });
 
