@@ -1,0 +1,22 @@
+name: CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build and push Docker images
+      run: |
+        docker-compose build
+        # Здесь добавьте команды для push в ваш Docker registry
+
+    - name: Deploy
+      run: |
+        # Здесь добавьте команды для деплоя
+        # Например, использование ssh-deploy или других инструментов
