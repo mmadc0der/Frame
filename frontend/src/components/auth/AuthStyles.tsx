@@ -54,6 +54,10 @@ export const SubmitButton = styled.button`
   &:hover {
     background: ${props => props.theme.colors.accentDark};
   }
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
 `;
 
 export const SocialButton = styled.button`
@@ -75,13 +79,17 @@ export const SocialButton = styled.button`
     background: ${props => props.theme.colors.modal.input};
     border-color: ${props => props.theme.colors.primary};
   }
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
 `;
 
 export const Divider = styled.div`
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 1.5rem 0;
+  margin: 1rem 0;
   color: ${props => props.theme.colors.primary};
   font-size: 0.875rem;
 

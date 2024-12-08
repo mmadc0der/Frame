@@ -55,6 +55,10 @@ const LoginButton = styled.button`
   &:hover {
     opacity: 0.8;
   }
+&:focus {
+    outline: none;
+    box-shadow: none;
+  }
 `
 
 const Content = styled.div`
