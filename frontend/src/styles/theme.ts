@@ -9,8 +9,8 @@ export const theme = {
     text: '#2D3250'
   },
   fonts: {
-    body: "'Inter', sans-serif",
-    heading: "'Poppins', sans-serif"
+    heading: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    body: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
   },
   breakpoints: {
     mobile: '320px',
@@ -69,15 +69,14 @@ export const theme = {
     },
     header: {
       position: 'fixed',
-      top: 0,
-      left: 0,
+      top: '0',
+      left: '0',
       width: '100%',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '1rem 2rem',
-      background: 'colors.background',
-      zIndex: 100
+      zIndex: 1000
     },
     logo: {
       fontFamily: 'fonts.heading',
