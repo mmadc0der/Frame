@@ -1,5 +1,6 @@
 import { api, handleApiError } from './api';
 import { LoginRequest, RegisterRequest, LoginResponse, RegisterResponse } from '../types/api';
+import { useAuth } from '../contexts/AuthContext';
 
 export const authService = {
   async register(data: RegisterRequest): Promise<RegisterResponse> {
@@ -11,28 +12,38 @@ export const authService = {
     }
   },
 
-  async login(data: LoginRequest): Promise<LoginResponse> {
+  async login(data: LoginRequest): Promise<void> {
     try {
       const response = await api.post<LoginResponse>('/auth/login', data);
-      const { access_token, refresh_token } = response.data;
+      const { access_token } = response.data;
 
-      // Сохраняем токены в localStorage
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('refresh_token', refresh_token);
+      const auth = useAuth();
 
-      return response.data;
+      // Устанавливаем Access-токен в AuthContext
+      auth.setAccessToken(access_token);
     } catch (error) {
       throw new Error(handleApiError(error));
     }
   },
 
-  logout() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+  async logout(): Promise<void> {
+    try {
+      await api.post('/auth/logout'); // Если есть logout endpoint на сервере
+    } catch (error) {
+      console.warn('Logout request failed, proceeding with local logout:', handleApiError(error));
+    }
+
+    const auth = useAuth();
+
+    // Очищаем токены в AuthContext
+    auth.clearTokens();
+
+    // Перенаправление на страницу входа
     window.location.href = '/login';
   },
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('access_token');
-  }
+    const auth = useAuth();
+    return auth.isAuthenticated;
+  },
 };

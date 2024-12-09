@@ -1,52 +1,52 @@
 import axios, { AxiosError } from 'axios';
 import { ApiError } from '../types/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
+declare module 'axios' {
+  export interface InternalAxiosRequestConfig<D = any> extends AxiosRequestConfig {
+    _retry?: boolean;
+  }
+}
 
 export const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Передача cookies с запросами
 });
 
 // Перехватчик запросов для добавления токена авторизации
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-}, (error) => Promise.reject(error));
-
-// Перехватчик ответов для обработки ошибок
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiError>) => {
     const originalRequest = error.config;
 
-    // Обработка ошибок аутентификации
-    if (error.response?.status === 401) {
+    // Проверяем, что это 401 ошибка, и запрос еще не повторялся
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      originalRequest._retry = true; // Помечаем запрос, чтобы избежать циклов
+
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (!refreshToken) {
-          throw new Error('No refresh token');
-        }
+        // Пытаемся обновить токен
+        const response = await axios.post(`${BASE_URL}/auth/refresh`, null, {
+          withCredentials: true, // Refresh-токен передается через cookies
+        });
 
-        const response = await axios.post(`${BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
-        const { access_token } = response.data;
+        const { accessToken } = response.data;
+        const auth = useAuth();
 
-        localStorage.setItem('access_token', access_token);
-        
-        // Повторяем оригинальный запрос с новым токеном
-        if (originalRequest) {
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
-          return api(originalRequest);
-        }
+        auth.setAccessToken(accessToken); // Сохраняем новый Access-токен в контексте
+
+        // Повторяем оригинальный запрос с обновленным токеном
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return api(originalRequest);
       } catch (refreshError) {
-        // Если обновление токена не удалось, выходим из системы
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+        const auth = useAuth();
+
+        // Если обновление токена не удалось, очищаем состояние и перенаправляем
+        auth.clearTokens();
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
