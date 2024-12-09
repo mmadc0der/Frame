@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { ThemeProvider } from 'styled-components';
 import { Landing } from '../pages/Landing';
 import { theme } from '../styles/theme';
@@ -25,6 +25,12 @@ describe('Landing Component', () => {
   beforeEach(() => {
     // Сбрасываем значение scrollY перед каждым тестом
     window.scrollY = 0;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks(); // Сброс моков и вызовов
+    jest.clearAllTimers(); // Сброс таймеров
+    cleanup();
   });
 
   it('renders initial welcome message', () => {
