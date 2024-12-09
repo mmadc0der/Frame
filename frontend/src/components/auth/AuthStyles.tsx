@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export interface InputProps {
-  hasError?: boolean;
+  $hasError?: boolean;
 }
 
 export const Form = styled.form`
@@ -14,7 +14,7 @@ export const Form = styled.form`
 export const Input = styled.input<InputProps>`
   padding: 0.875rem 1rem;
   background: ${props => props.theme.colors.modal.input};
-  border: 2px solid ${props => props.hasError
+  border: 2px solid ${props => props.$hasError
     ? props.theme.colors.modal.error
     : props.theme.colors.modal.inputBorder};
   border-radius: 8px;
@@ -26,10 +26,10 @@ export const Input = styled.input<InputProps>`
 
   &:focus {
     outline: none;
-    border-color: ${props => props.hasError
+    border-color: ${props => props.$hasError
       ? props.theme.colors.modal.error
       : props.theme.colors.accent};
-    box-shadow: 0 0 0 3px ${props => props.hasError
+    box-shadow: 0 0 0 3px ${props => props.$hasError
       ? props.theme.colors.modal.error + '20'
       : props.theme.colors.accent + '20'};
   }
@@ -54,6 +54,10 @@ export const SubmitButton = styled.button`
   &:hover {
     background: ${props => props.theme.colors.accentDark};
   }
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
 `;
 
 export const SocialButton = styled.button`
@@ -71,9 +75,19 @@ export const SocialButton = styled.button`
   cursor: pointer;
   transition: all 0.2s;
 
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
   &:hover {
     background: ${props => props.theme.colors.modal.input};
     border-color: ${props => props.theme.colors.primary};
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
   }
 `;
 
@@ -81,7 +95,7 @@ export const Divider = styled.div`
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 1.5rem 0;
+  margin: 1rem 0;
   color: ${props => props.theme.colors.primary};
   font-size: 0.875rem;
 
