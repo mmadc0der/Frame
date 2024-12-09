@@ -75,13 +75,19 @@ export const SocialButton = styled.button`
   cursor: pointer;
   transition: all 0.2s;
 
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
   &:hover {
     background: ${props => props.theme.colors.modal.input};
     border-color: ${props => props.theme.colors.primary};
   }
+
   &:focus {
     outline: none;
-    box-shadow: none;
+    box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
   }
 `;
 
