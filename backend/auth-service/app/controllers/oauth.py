@@ -35,7 +35,7 @@ def github_callback():
     github_user = get_github_user_info(github_access_token)
     
     # Поиск или создание пользователя
-    user = User.query.filter_by(email=github_user['email']).first()
+    user = db.session.query(User).filter_by(email=github_user['email']).first()
     
     if not user:
         user = User(

@@ -126,7 +126,7 @@ def update_role_permissions(role_id):
     if error:
         return error
 
-    role = Role.query.get_or_404(role_id)
+    role = db.session.get(Role, role_id)
     data = request.get_json()
     
     if not data or 'permissions' not in data:
@@ -136,7 +136,7 @@ def update_role_permissions(role_id):
                       metadata={"role_id": role_id})
         return jsonify({"error": "Permissions list is required"}), 400
 
-    permissions = Permission.query.filter(Permission.name.in_(data['permissions'])).all()
+    permissions = db.session.query(Permission).filter(Permission.name.in_(data['permissions'])).all()
     if len(permissions) != len(data['permissions']):
         logger.warning("Role permissions update with non-existent permissions",
                       user_id=get_jwt_identity(),
@@ -162,7 +162,7 @@ def update_user_roles(user_id):
     if error:
         return error
 
-    user = User.query.get_or_404(user_id)
+    user = db.session.get(User, user_id)
     data = request.get_json()
     
     if not data or 'roles' not in data:

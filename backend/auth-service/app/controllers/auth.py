@@ -123,7 +123,7 @@ def logout():
 def get_current_user():
     """Получение информации о текущем пользователе"""
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         logger.error("User not found for token",
                     user_id=user_id,
