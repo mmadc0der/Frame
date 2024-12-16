@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { describe, it, expect, vi } from 'vitest';
 
 const TestComponent: React.FC = () => {
   const { accessToken, isAuthenticated, setAccessToken, clearTokens } = useAuth();
@@ -17,7 +18,7 @@ const TestComponent: React.FC = () => {
 
 describe('AuthContext', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
   
   it('should initialize with null accessToken and isAuthenticated as false', () => {

@@ -4,6 +4,7 @@ import { ThemeProvider } from 'styled-components';
 import { LoginForm } from '../components/auth/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
 import { theme } from '../styles/theme';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const renderWithTheme = (component: React.ReactElement) => {
   return render(
@@ -15,7 +16,7 @@ const renderWithTheme = (component: React.ReactElement) => {
 
 describe('Authentication Forms', () => {
   describe('LoginForm', () => {
-    const mockSwitch = jest.fn();
+    const mockSwitch = vi.fn();
 
     beforeEach(() => {
       renderWithTheme(<LoginForm onSwitch={mockSwitch} />);
@@ -59,7 +60,7 @@ describe('Authentication Forms', () => {
   });
 
   describe('RegisterForm', () => {
-    const mockSwitch = jest.fn();
+    const mockSwitch = vi.fn();
 
     beforeEach(() => {
       renderWithTheme(<RegisterForm onSwitch={mockSwitch} />);
