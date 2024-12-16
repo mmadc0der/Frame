@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package log_service;
+
+service LogService {
+  // Отправка лога
+  rpc SendLog (LogMessage) returns (LogResponse) {}
+  
+  // Получение логов (только для админов)
+  rpc GetLogs (LogRequest) returns (LogsResponse) {}
+}
+
+// Сообщение с логом
+message LogMessage {
+  // Временная метка события
+  int64 timestamp = 1;
+  
+  // Имя сервиса, отправившего лог
+  string service_name = 2;
+  
+  // Уровень лога (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  LogLevel level = 3;
+  
+  // Сообщение лога
+  string message = 4;
+  
+  // Дополнительные метаданные в формате JSON
+  string metadata = 5;
+  
+  // ID пользователя (если применимо)
+  optional int32 user_id = 6;
+  
+  // Действие пользователя (если применимо)
+  optional string action = 7;
+}
+
+// Уровни логирования
+enum LogLevel {
+  DEBUG = 0;
+  INFO = 1;
+  WARNING = 2;
+  ERROR = 3;
+  CRITICAL = 4;
+}
+
+// Запрос на получение логов
+message LogRequest {
+  // Начальная временная метка
+  int64 start_timestamp = 1;
+  
+  // Конечная временная метка
+  int64 end_timestamp = 2;
+  
+  // Фильтр по уровню лога
+  optional LogLevel level = 3;
+  
+  // Фильтр по сервису
+  optional string service_name = 4;
+  
+  // Фильтр по пользователю
+  optional int32 user_id = 5;
+  
+  // Количество записей на странице
+  int32 page_size = 6;
+  
+  // Номер страницы
+  int32 page_number = 7;
+}
+
+// Ответ с логами
+message LogsResponse {
+  // Список логов
+  repeated LogMessage logs = 1;
+  
+  // Общее количество логов
+  int32 total_count = 2;
+  
+  // Текущая страница
+  int32 page_number = 3;
+  
+  // Размер страницы
+  int32 page_size = 4;
+}
+
+// Ответ на отправку лога
+message LogResponse {
+  // Успешность операции
+  bool success = 1;
+  
+  // Сообщение об ошибке (если есть)
+  optional string error = 2;
+}
