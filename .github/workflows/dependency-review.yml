@@ -24,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.9'
+          python-version: '3.12'
 
       - name: Install safety
         run: pip install safety
@@ -32,7 +32,7 @@ jobs:
       - name: Check Python dependencies
         run: |
           cd backend/auth-service
-          safety scan -r requirements.txt
+          safety check -r requirements.txt
 
   node-dependencies:
     runs-on: ubuntu-latest
