@@ -1,11 +1,10 @@
 import pytest
-from app.app import create_app
-from app.models import db
+from app import create_app, db
 
 
 @pytest.fixture
 def app():
-    app = create_app("testing")
+    app = create_app('app.config.TestingConfig')
     return app
 
 
@@ -18,6 +17,6 @@ def client(app):
 def db_session(app):
     with app.app_context():
         db.create_all()
-        yield db
+        yield db.session
         db.session.remove()
         db.drop_all()

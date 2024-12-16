@@ -1,4 +1,4 @@
-flask==2.3.2
+flask==2.2.5
 flask-sqlalchemy==3.0.3
 flask-jwt-extended==4.7.1
 redis==4.5.4
@@ -13,3 +13,4 @@ grpclib==0.4.3
 protobuf==4.23.1
 python-jose==3.3.0
 psycopg2-binary==2.9.10
+werkzeug==2.2.3

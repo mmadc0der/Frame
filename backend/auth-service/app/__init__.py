@@ -2,11 +2,13 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 import redis
+from .services.log_service import LogService
 
 # Инициализация глобальных объектов
 db = SQLAlchemy()
 jwt = JWTManager()
 redis_client = redis.Redis(host='localhost', port=6379, db=0)
+logger = LogService()
 
 def create_app(config_object='app.config.Config'):
     """Создание и конфигурация Flask приложения"""

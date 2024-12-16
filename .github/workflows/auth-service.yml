@@ -1,13 +1,17 @@
-name: CI
+name: Auth Service CI
 
 on:
   push:
-    branches: [ main, dev ]
+    paths:
+      - 'backend/auth-service/**'
+      - '.github/workflows/auth-service.yml'
   pull_request:
-    branches: [ main, dev ]
+    paths:
+      - 'backend/auth-service/**'
+      - '.github/workflows/auth-service.yml'
 
 jobs:
-  auth-service-tests:
+  test:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -35,12 +39,20 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v2
       with:
         python-version: '3.9'
+
+    - name: Cache pip packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/auth-service/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - name: Install dependencies
       run: |
@@ -66,24 +78,3 @@ jobs:
         files: ./backend/auth-service/coverage.xml
         flags: auth-service
         fail_ci_if_error: true
-
-  frontend-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Install dependencies
-      run: |
-        cd frontend
-        npm install
-
-    - name: Run tests
-      run: |
-        cd frontend
-        npm test
