@@ -30,7 +30,7 @@ def register():
     
     # Создание нового пользователя
     new_user = User(
-        username=data['username'],
+        username='username',
         email=data['email']
     )
     new_user.set_password(data['password'])

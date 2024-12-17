@@ -8,7 +8,7 @@ export interface ApiError {
 export interface RegisterRequest {
   email: string;
   password: string;
-  username: string;
+  // username: string;
 }
 
 export interface RegisterResponse {

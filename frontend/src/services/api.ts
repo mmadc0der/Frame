@@ -2,7 +2,9 @@ import axios, { AxiosError } from 'axios';
 import { ApiError } from '../types/api';
 import { useAuth } from '../contexts/AuthContext';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+//const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/';
+
+const BASE_URL = 'http://localhost:5000/';
 
 declare module 'axios' {
   export interface InternalAxiosRequestConfig<D = any> extends AxiosRequestConfig {

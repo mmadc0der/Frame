@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { Form, Input, SubmitButton, SocialButton, Divider, ErrorMessage } from './AuthStyles';
-// import { authService } from '../../services/auth';
+import { authService } from '../../services/auth';
 
 interface RegisterFormProps {
   onSwitch: () => void;
@@ -137,11 +137,23 @@ export const RegisterForm = ({ onSwitch }: RegisterFormProps) => {
     return !emailError && !passwordError && !confirmPasswordError;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setErrors({});
+
+    if (password !== confirmPassword) {
+      setErrors({ confirmPassword: 'Passwords do not match.' });
+      return;
+    }
+
     if (validateForm()) {
-      // TODO: Implement registration logic
-      console.log('Register attempt:', { email, password });
+      try {
+        await authService.register({ email, password });
+        // TODO: Handle successful registration (e.g., redirect, show message, etc.)
+        console.log('Registration successful');
+      } catch (error) {
+        setErrors({ email: 'Registration failed. Please try again.' });
+      }
     }
   };
 
