@@ -1,0 +1,85 @@
+name: Auth Service CI
+
+on:
+  push:
+    paths:
+      - 'backend/auth-service/**'
+      - '.github/workflows/auth-service.yml'
+  pull_request:
+    paths:
+      - 'backend/auth-service/**'
+      - '.github/workflows/auth-service.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: auth_test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:6
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.12.6'
+
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/auth-service/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        cd backend/auth-service
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+
+    - name: Run tests
+      env:
+        DATABASE_URL: postgresql://test_user:test_password@localhost:5432/auth_test_db
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
+        JWT_SECRET_KEY: test_secret_key
+        SECRET_KEY: test_app_secret
+      run: |
+        cd backend/auth-service
+        export PYTHONPATH=$(pwd)
+        pytest tests/ --cov=app --cov-report=xml
+
+    - name: Upload coverage report as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: backend/auth-service/coverage.xml
+
+    - name: Upload coverage to GitHub checks
+      run: |
+        curl -u ${{ secrets.TOKEN }} -X POST -d @coverage.xml \
+          https://api.github.com/repos/${{ github.repository }}/check-runs

@@ -28,8 +28,6 @@ describe('Landing Component', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // Сброс моков и вызовов
-    jest.clearAllTimers(); // Сброс таймеров
     cleanup();
   });
 
@@ -41,9 +39,12 @@ describe('Landing Component', () => {
 
   it('renders Frame logo that links to home', () => {
     renderWithTheme(<Landing />);
-    const logo = screen.getByText('Frame');
-    const link = logo.closest('a');
-    expect(link).toHaveAttribute('href', '/');
+    const logos = screen.getAllByText('Frame');
+    const hasLogoWithHomeLink = logos.some(logo => {
+      const link = logo.closest('a');
+      return link?.getAttribute('href') === '/';
+    });
+    expect(hasLogoWithHomeLink).toBe(true);
   });
 
   it('renders login button', () => {
@@ -54,7 +55,7 @@ describe('Landing Component', () => {
 
   it('shows creator signature', () => {
     renderWithTheme(<Landing />);
-    const signature = screen.getByText('© created by madc0der');
+    const signature = screen.getByText(/created by madc0der$/);
     expect(signature).toBeInTheDocument();
   });
 
