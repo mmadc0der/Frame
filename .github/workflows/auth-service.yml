@@ -79,6 +79,15 @@ jobs:
         name: coverage-report
         path: backend/auth-service/coverage.xml
 
+    - name: Check Coverage File
+      run: |
+        if [ -f backend/auth-service/coverage.xml ]; then
+          echo "Coverage file exists."
+          cat backend/auth-service/coverage.xml
+        else
+          echo "Coverage file does not exist."
+        fi
+
     - name: Upload coverage to GitHub checks
       run: |
         coverage xml -o coverage.xml
