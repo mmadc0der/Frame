@@ -1,8 +1,6 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import (
-    jwt_required, get_jwt_identity, get_jwt,
-    verify_jwt_in_request
-)
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
+from flask_jwt_extended.exceptions import NoAuthorizationError, InvalidHeaderError
 from app.models.user import User
 from app.services.auth_service import AuthService
 from app import db, logger
@@ -140,21 +138,39 @@ def get_current_user():
 def validate_token():
     """Валидация токена для других сервисов"""
     try:
+        # Валидация токена
         verify_jwt_in_request()
         claims = get_jwt()
         user_id = get_jwt_identity()
-        
+
         logger.debug("Token validated",
-                    user_id=user_id,
-                    action="validate_token",
-                    metadata={"roles": claims.get('roles', [])})
+                     user_id=user_id,
+                     action="validate_token",
+                     metadata={"roles": claims.get('roles', [])})
         
         return jsonify({
             "valid": True,
             "user_id": user_id,
             "roles": claims.get('roles', [])
         }), 200
-    except:
-        logger.warning("Invalid token validation attempt",
-                      action="validate_token")
-        return jsonify({"valid": False}), 401
+    except NoAuthorizationError as e:
+        logger.warning("Missing or invalid Authorization header",
+                       metadata={"error": str(e)},
+                       action="validate_token")
+        return jsonify({"valid": False, "error": "Missing or invalid Authorization header"}), 401
+    except InvalidHeaderError as e:
+        logger.warning("Invalid Authorization header format",
+                       metadata={"error": str(e)},
+                       action="validate_token")
+        return jsonify({"valid": False, "error": "Invalid Authorization header format"}), 401
+    except Exception as e:
+        if type(e).__name__ in ("InvalidSubjectError", "DecodeError"):
+            logger.warning("Invalid JWT format",
+                           metadata={"error": str(e)},
+                           action="validate_token")
+            return jsonify({"valid": False, "error": "Invalid JWT format"}), 422
+        logger.warning("Unexpected error during token validation",
+                       metadata={"error":{type(e).__name__: str(e.args)}},
+                       action="validate_token")
+        return jsonify({"valid": False, "error": "Unexpected error"}), 500
+

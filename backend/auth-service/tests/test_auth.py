@@ -104,5 +104,5 @@ def test_validate_invalid_token(client):
     response = client.post('/auth/validate', headers={
         'Authorization': 'Bearer invalid_token'
     })
-    assert response.status_code == 401
+    assert response.status_code == 422
     assert response.json['valid'] is False

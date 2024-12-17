@@ -2,7 +2,7 @@ from app import db
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Table, ForeignKey, Date, JSON
 from sqlalchemy.sql import func
-from passlib.hash import bcrypt
+import bcrypt
 
 # Таблица связи пользователей и ролей
 user_roles = Table(
@@ -37,13 +37,13 @@ class User(db.Model):
 
     def set_password(self, password):
         """Хеширование пароля"""
-        self.password_hash = bcrypt.hash(password)
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
 
     def check_password(self, password):
         """Проверка пароля"""
         if not self.password_hash:
             return False
-        return bcrypt.verify(password, self.password_hash)
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
     def to_dict(self):
         """Сериализация пользователя"""

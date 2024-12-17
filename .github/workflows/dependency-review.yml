@@ -24,10 +24,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.12'
+          python-version: '3.12.6'
 
       - name: Install safety
-        run: pip install safety
+        run: pip install safety:3.2.13
 
       - name: Check Python dependencies
         run: |

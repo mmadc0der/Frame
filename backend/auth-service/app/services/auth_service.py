@@ -13,10 +13,10 @@ class AuthService:
         
         # Создаем токены
         access_token = create_access_token(
-            identity=user.id,
+            identity=str(user.id),
             additional_claims=additional_claims
         )
-        refresh_token = create_refresh_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=str(user.id))
 
         # Сохраняем информацию о refresh токене в Redis
         session_data = {
@@ -24,7 +24,7 @@ class AuthService:
             'created_at': datetime.now(timezone.utc).isoformat()
         }
         redis_client.setex(
-            f'refresh_token:{refresh_token}',
+            f'{user.id}:refresh_token:{refresh_token}',
             60 * 60 * 24 * 30,  # 30 дней
             json.dumps(session_data)
         )
