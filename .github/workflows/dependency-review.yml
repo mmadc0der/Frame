@@ -27,7 +27,7 @@ jobs:
           python-version: '3.12.6'
 
       - name: Install safety
-        run: pip install safety:3.2.13
+        run: pip install safety==3.2.13
 
       - name: Check Python dependencies
         run: |
