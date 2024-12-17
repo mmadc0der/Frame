@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { Form, Input, SubmitButton, SocialButton, Divider, ErrorMessage } from './AuthStyles';
-//import { authService } from '../../services/auth';
+import { authService } from '../../services/auth';
 
 interface LoginFormProps {
   onSwitch: () => void;
@@ -99,11 +99,17 @@ export const LoginForm = ({ onSwitch }: LoginFormProps) => {
     return !emailError && !passwordError;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      // TODO: Implement login logic
-      console.log('Login attempt:', { email, password });
+      try {
+        await authService.login({ email, password });
+        // TODO: Handle successful login (e.g., redirect, show message, etc.)
+        console.log('Login successful');
+      } catch (error) {
+        setErrors({ email: 'Invalid email or password.' });
+        setErrors({ password: ''});
+      }
     }
   };
 

@@ -8,3 +8,4 @@ bcrypt==4.2.1
 Requests==2.32.3
 SQLAlchemy==2.0.36
 redis==5.2.1
+psycopg2==2.9.10
