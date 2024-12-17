@@ -1,6 +1,6 @@
 # Frame - Personal Daily Journal
 
-[![Auth Service CI](https://github.com/yourusername/Frame/actions/workflows/auth-service.yml/badge.svg)](https://github.com/yourusername/Frame/actions/workflows/auth-service.yml)
+![Auth Service CI](https://github.com/mmadc0der/Frame/tree/main/backend/auth-service)
 
 Микросервисное приложение для создания персонализированного ежедневника с модульной структурой.
 
