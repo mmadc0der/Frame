@@ -81,8 +81,5 @@ jobs:
 
     - name: Upload coverage to GitHub checks
       run: |
-        coverage xml -o backend/auth-service/coverage.xml
-        curl -u ${{ secrets.TOKEN }} -X POST -d @backend/auth-service/coverage.xml \
+        curl -u ${{ secrets.TOKEN }} -X POST -d @coverage.xml \
           https://api.github.com/repos/${{ github.repository }}/check-runs
-      
-    
