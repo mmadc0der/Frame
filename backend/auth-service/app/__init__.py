@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 import redis
 from .services.log_service import LogService
+from flask_cors import CORS
 
 # Инициализация глобальных объектов
 db = SQLAlchemy()
