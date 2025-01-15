@@ -176,5 +176,4 @@ def validate_token():
 
 @auth_bp.route('/health', methods=['GET'])
 def health_check():
-    """Проверка работоспособности сервиса"""
     return jsonify({"status": "healthy"}), 200

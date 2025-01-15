@@ -47,3 +47,21 @@ def db_session(app):
         yield db.session
         db.session.remove()
         db.drop_all()
+
+
+@pytest.fixture
+def access_token(client, db_session):
+    """Фикстура для получения тестового access токена"""
+    # Регистрируем тестового пользователя
+    client.post('/auth/register', json={
+        'username': 'testuser',
+        'email': 'test@example.com',
+        'password': 'testpass123'
+    })
+    
+    # Логинимся и получаем токен
+    response = client.post('/auth/login', json={
+        'username': 'testuser',
+        'password': 'testpass123'
+    })
+    return response.json['access_token']
