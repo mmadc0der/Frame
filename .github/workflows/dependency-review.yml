@@ -29,9 +29,14 @@ jobs:
       - name: Install safety
         run: pip install safety==3.2.13
 
-      - name: Check Python dependencies
+      - name: Check auth-service Python dependencies
         run: |
           cd backend/auth-service
+          safety check -r requirements.txt
+
+      - name: Check name-service Python dependencies
+        run: |
+          cd backend/name-service
           safety check -r requirements.txt
 
   node-dependencies:
