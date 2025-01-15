@@ -1,5 +1,6 @@
 import pytest
-from app import create_app, db
+from unittest.mock import MagicMock
+from app import create_app, db, redis_client
 
 
 @pytest.fixture
@@ -18,6 +19,13 @@ def app():
             '/auth/oauth/yandex'
         ]
     })
+    
+    # Мокаем Redis для тестов
+    redis_mock = MagicMock()
+    redis_mock.setex.return_value = True
+    redis_mock.get.return_value = None
+    redis_mock.delete.return_value = True
+    app.redis_client = redis_mock
     
     return app
 
