@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 import redis
 from .services.log_service import LogService
+from flask_cors import CORS
 
 # Инициализация глобальных объектов
 db = SQLAlchemy()
@@ -21,6 +22,9 @@ def create_app(config_object='app.config.Config'):
     db.init_app(app)
     jwt.init_app(app)
     
+    # Инициализация CORS
+    CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})  # Разрешить доступ с любых источников
+
     # Регистрация блюпринтов
     from .controllers.auth import auth_bp
     from .controllers.oauth import oauth_bp
