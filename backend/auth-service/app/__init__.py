@@ -56,9 +56,9 @@ def create_app(config_object='app.config.Config'):
                     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
                     response.headers['X-XSS-Protection'] = '1; mode=block'
             else:
-                # Если origin не разрешен, удаляем CORS заголовки
+                # Если origin не разрешен, удаляем CORS заголовки и возвращаем 403
                 response.headers.pop('Access-Control-Allow-Origin', None)
-                return response, 403
+                response.status_code = 403
 
         # Для OPTIONS запросов возвращаем пустой ответ
         if request.method == 'OPTIONS':
