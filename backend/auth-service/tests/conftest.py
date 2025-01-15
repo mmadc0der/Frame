@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from app import create_app, db, redis_client
 
 
@@ -20,14 +20,17 @@ def app():
         ]
     })
     
-    # Мокаем Redis для тестов
-    redis_mock = MagicMock()
-    redis_mock.setex.return_value = True
-    redis_mock.get.return_value = None
-    redis_mock.delete.return_value = True
-    app.redis_client = redis_mock
-    
     return app
+
+
+@pytest.fixture(autouse=True)
+def mock_redis():
+    """Мок для Redis, который будет использоваться автоматически во всех тестах"""
+    with patch('app.redis_client') as mock:
+        mock.setex.return_value = True
+        mock.get.return_value = None
+        mock.delete.return_value = True
+        yield mock
 
 
 @pytest.fixture
