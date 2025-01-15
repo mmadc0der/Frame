@@ -9,4 +9,3 @@ Requests==2.32.3
 SQLAlchemy==2.0.36
 redis==5.2.1
 psycopg2==2.9.10
-flask-cors==5.0.0
