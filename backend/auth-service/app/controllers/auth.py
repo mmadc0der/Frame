@@ -173,3 +173,8 @@ def validate_token():
                        metadata={"error":{type(e).__name__: str(e.args)}},
                        action="validate_token")
         return jsonify({"valid": False, "error": "Unexpected error"}), 500
+
+@auth_bp.route('/health', methods=['GET'])
+def health_check():
+    """Проверка работоспособности сервиса"""
+    return jsonify({"status": "healthy"}), 200
