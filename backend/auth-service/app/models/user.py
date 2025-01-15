@@ -17,7 +17,7 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    username = Column(String(255), unique=True)
+    username = Column(String(255), unique=True)         # TODO: make it not-unicue
     email = Column(String(255), unique=True, nullable=False)
     email_verified = Column(Boolean, default=False, nullable=False)
     password_hash = Column(String(255))
