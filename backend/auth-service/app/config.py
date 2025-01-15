@@ -35,15 +35,36 @@ class Config:
     LOG_SERVICE_HOST = os.getenv('LOG_SERVICE_HOST', 'localhost')
     LOG_SERVICE_PORT = int(os.getenv('LOG_SERVICE_PORT', 50051))
 
+    # CORS Configuration
+    CORS_ALLOWED_ORIGINS = os.getenv(
+        'CORS_ALLOWED_ORIGINS',
+        'http://localhost:3000,http://localhost:8080'
+    ).split(',')
+    
+    # Public endpoints that don't require strict CORS
+    CORS_PUBLIC_ENDPOINTS = [
+        '/auth/health',
+        '/auth/login',
+        '/auth/register',
+        '/auth/oauth/github',
+        '/auth/oauth/yandex'
+    ]
+
 class DevelopmentConfig(Config):
     """Конфигурация для разработки"""
     DEBUG = True
+    # В режиме разработки разрешаем все origins
+    CORS_ALLOWED_ORIGINS = ['*']
 
 class ProductionConfig(Config):
     """Конфигурация для продакшена"""
     DEBUG = False
+    # В продакшене используем только безопасные настройки
+    JWT_COOKIE_SECURE = True
+    JWT_COOKIE_SAMESITE = 'Strict'
 
 class TestingConfig(Config):
     """Конфигурация для тестирования"""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    CORS_ALLOWED_ORIGINS = ['*']
