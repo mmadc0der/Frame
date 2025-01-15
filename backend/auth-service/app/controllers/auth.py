@@ -30,7 +30,7 @@ def register():
     
     # Создание нового пользователя
     new_user = User(
-        username='username',
+        username=data['username'],
         email=data['email']
     )
     new_user.set_password(data['password'])
@@ -173,4 +173,3 @@ def validate_token():
                        metadata={"error":{type(e).__name__: str(e.args)}},
                        action="validate_token")
         return jsonify({"valid": False, "error": "Unexpected error"}), 500
-
