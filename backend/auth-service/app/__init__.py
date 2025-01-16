@@ -7,7 +7,7 @@ from .services.log_service import LogService
 # Инициализация глобальных объектов
 db = SQLAlchemy()
 jwt = JWTManager()
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+redis_client = None  # Инициализируем позже
 logger = LogService()
 
 def create_app(config_object='app.config.Config'):
@@ -20,6 +20,15 @@ def create_app(config_object='app.config.Config'):
     # Инициализация расширений
     db.init_app(app)
     jwt.init_app(app)
+
+    # Инициализация Redis клиента
+    global redis_client
+    redis_client = redis.Redis(
+        host=app.config['REDIS_HOST'],
+        port=app.config['REDIS_PORT'],
+        password=app.config['REDIS_PASSWORD'],
+        decode_responses=True
+    )
 
     # Настройка CORS с помощью встроенного механизма Flask
     @app.after_request
@@ -36,7 +45,8 @@ def create_app(config_object='app.config.Config'):
         if is_public_endpoint:
             response.headers['Access-Control-Allow-Origin'] = '*'
             response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
-            response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
         
         # Для защищенных эндпоинтов используем строгие правила
         else:
@@ -65,15 +75,16 @@ def create_app(config_object='app.config.Config'):
 
         return response
 
-    # Регистрация блюпринтов
+    # Регистрация blueprints
+    from .controllers.health import health_bp
+    app.register_blueprint(health_bp)
+    
     from .controllers.auth import auth_bp
     from .controllers.oauth import oauth_bp
-    from .controllers.health import health_bp
     from .controllers.admin import admin_bp
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(oauth_bp, url_prefix='/auth/oauth')
-    app.register_blueprint(health_bp, url_prefix='/auth')
     app.register_blueprint(admin_bp, url_prefix='/auth/admin')
     
     return app

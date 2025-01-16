@@ -33,9 +33,9 @@ services:
       - NAME_SERVICE_HOST=name-service
       - NAME_SERVICE_PORT=${NAME_SERVICE_PORT}
     depends_on:
-      postgres:
+      auth-postgres:
         condition: service_healthy
-      redis:
+      auth-redis:
         condition: service_healthy
       log-service:
         condition: service_started
@@ -73,7 +73,7 @@ services:
         max-size: "${LOG_MAX_SIZE}"
         max-file: "${LOG_MAX_FILE}"
 
-  postgres:
+  auth-postgres:
     image: postgres:17.2
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -96,7 +96,7 @@ services:
         max-size: "${LOG_MAX_SIZE}"
         max-file: "${LOG_MAX_FILE}"
 
-  redis:
+  auth-redis:
     image: redis:7.4
     command: redis-server --requirepass ${REDIS_PASSWORD}
     expose:

@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_j
 from flask_jwt_extended.exceptions import NoAuthorizationError, InvalidHeaderError
 from app.models.user import User
 from app.services.auth_service import AuthService
+from app.services.name_service import NameService
 from app import db, logger
 
 auth_bp = Blueprint('auth', __name__)
@@ -13,37 +14,54 @@ def register():
     data = request.get_json()
     
     # Валидация входных данных
-    if not data or not data.get('email') or not data.get('password') or not data.get('username'):
+    if not data or not data.get('email') or not data.get('password'):
         logger.warning("Registration attempt with invalid data", 
                       metadata={"received_fields": list(data.keys()) if data else None})
-        return jsonify({"error": "Username, email and password are required"}), 400
+        return jsonify({"error": "Email and password are required"}), 400
     
-    # Проверка существования пользователя
+    # Проверка существования пользователя по email
     if User.query.filter_by(email=data['email']).first():
         logger.info("Registration attempt with existing email",
                    metadata={"email": data['email']})
         return jsonify({"error": "User with this email already exists"}), 409
-    if User.query.filter_by(username=data['username']).first():
-        logger.info("Registration attempt with existing username",
-                   metadata={"username": data['username']})
-        return jsonify({"error": "User with this username already exists"}), 409
     
-    # Создание нового пользователя
-    new_user = User(
-        username=data['username'],
-        email=data['email']
-    )
-    new_user.set_password(data['password'])
-    
-    db.session.add(new_user)
-    db.session.commit()
-    
-    logger.info("New user registered", 
-                user_id=new_user.id,
-                action="user_registered",
-                metadata={"username": new_user.username, "email": new_user.email})
-    
-    return jsonify({"message": "User successfully registered"}), 201
+    try:
+        # Генерация уникального имени пользователя
+        name_service = NameService()
+        username = name_service.generate_username()
+        
+        # Проверяем, что сгенерированное имя не занято
+        while User.query.filter_by(username=username).first():
+            username = name_service.generate_username()
+        
+        # Создание нового пользователя
+        new_user = User(
+            username=username,
+            email=data['email']
+        )
+        new_user.set_password(data['password'])
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        logger.info("New user registered", 
+                    user_id=new_user.id,
+                    action="user_registered",
+                    metadata={
+                        "username": new_user.username,
+                        "email": new_user.email,
+                        "generated_username": True
+                    })
+        
+        return jsonify({
+            "message": "User successfully registered",
+            "username": username
+        }), 201
+        
+    except RuntimeError as e:
+        logger.error("Name service error during registration",
+                    metadata={"error": str(e), "email": data['email']})
+        return jsonify({"error": "Failed to generate username. Please try again later"}), 503
 
 @auth_bp.route('/login', methods=['POST'])
 def login():

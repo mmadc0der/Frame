@@ -13,7 +13,7 @@ services:
     volumes:
       - ./backend/auth-service:/app  # Для hot reload в development
     ports:
-      - "5001:5001"  # Открываем порт для прямого доступа в development
+      - "5000:5000"  # Открываем порт для прямого доступа в development
 
   name-service:
     volumes:
@@ -27,10 +27,10 @@ services:
     ports:
       - "5100:5100"  # Открываем порт для прямого доступа в development
 
-  postgres:
+  auth-postgres:
     ports:
       - "5432:5432"  # Открываем порт для доступа к БД в development
 
-  redis:
+  auth-redis:
     ports:
       - "6379:6379"  # Открываем порт для доступа к Redis в development
