@@ -9,3 +9,6 @@ Requests==2.32.3
 SQLAlchemy==2.0.36
 redis==5.2.1
 psycopg2==2.9.10
+grpcio==1.69.0
+grpcio-tools==1.69.0
+protobuf==5.29.3

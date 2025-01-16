@@ -2,6 +2,10 @@ import json
 import time
 from enum import Enum
 from typing import Optional, Dict, Any
+import grpc
+from app.proto import log_service_pb2
+from app.proto import log_service_pb2_grpc
+from flask import current_app
 
 class LogLevel(Enum):
     DEBUG = 0
@@ -11,14 +15,22 @@ class LogLevel(Enum):
     CRITICAL = 4
 
 class LogService:
-    """
-    Клиент для отправки логов в сервис логирования.
-    Пока что это заглушка, которая будет заменена на реальный GRPC клиент.
-    """
+    """Клиент для отправки логов в сервис логирования через GRPC."""
+    
     def __init__(self, service_name: str = "auth-service"):
         self.service_name = service_name
-        # TODO: Инициализация GRPC клиента
-        # self.stub = ...
+        self._stub = None
+
+    @property
+    def stub(self):
+        """Ленивая инициализация GRPC stub"""
+        if self._stub is None:
+            # Создаем канал для связи с сервисом логирования
+            channel = grpc.insecure_channel(
+                f"{current_app.config['LOG_SERVICE_HOST']}:{current_app.config['LOG_SERVICE_PORT']}"
+            )
+            self._stub = log_service_pb2_grpc.LogServiceBaseStub(channel)
+        return self._stub
 
     def _prepare_metadata(self, metadata: Optional[Dict[str, Any]] = None) -> str:
         """Подготовка метаданных для отправки"""
@@ -42,35 +54,40 @@ class LogService:
             action: Действие пользователя (если применимо)
             metadata: Дополнительные метаданные
         """
-        log_data = {
-            "timestamp": int(time.time()),
-            "service_name": self.service_name,
-            "level": level.value,
-            "message": message,
-            "metadata": self._prepare_metadata(metadata),
-        }
-        
-        if user_id is not None:
-            log_data["user_id"] = user_id
-        if action is not None:
-            log_data["action"] = action
+        try:
+            # Создаем сообщение для отправки
+            log_message = log_service_pb2.LogMessage(
+                timestamp=int(time.time()),
+                service_name=self.service_name,
+                level=level.value,
+                message=message,
+                metadata=self._prepare_metadata(metadata),
+                user_id=user_id,
+                action=action
+            )
+            
+            # Отправляем лог
+            response = self.stub.SendLog(log_message)
+            
+            if not response.success:
+                print(f"Failed to send log: {response.error}")
+                
+        except grpc.RpcError as e:
+            print(f"GRPC Error while sending log: {str(e)}")
+        except Exception as e:
+            print(f"Unexpected error while sending log: {str(e)}")
 
-        # TODO: Отправка через GRPC
-        # response = self.stub.SendLog(log_message)
-        # Пока просто выводим в консоль
-        print(f"[LOG] {json.dumps(log_data)}")
+    def debug(self, message: str, user_id: Optional[int] = None, action: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> None:
+        self.send_log(message, LogLevel.DEBUG, user_id, action, metadata)
 
-    def debug(self, message: str, **kwargs):
-        self.send_log(message, LogLevel.DEBUG, **kwargs)
+    def info(self, message: str, user_id: Optional[int] = None, action: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> None:
+        self.send_log(message, LogLevel.INFO, user_id, action, metadata)
 
-    def info(self, message: str, **kwargs):
-        self.send_log(message, LogLevel.INFO, **kwargs)
+    def warning(self, message: str, user_id: Optional[int] = None, action: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> None:
+        self.send_log(message, LogLevel.WARNING, user_id, action, metadata)
 
-    def warning(self, message: str, **kwargs):
-        self.send_log(message, LogLevel.WARNING, **kwargs)
+    def error(self, message: str, user_id: Optional[int] = None, action: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> None:
+        self.send_log(message, LogLevel.ERROR, user_id, action, metadata)
 
-    def error(self, message: str, **kwargs):
-        self.send_log(message, LogLevel.ERROR, **kwargs)
-
-    def critical(self, message: str, **kwargs):
-        self.send_log(message, LogLevel.CRITICAL, **kwargs)
+    def critical(self, message: str, user_id: Optional[int] = None, action: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> None:
+        self.send_log(message, LogLevel.CRITICAL, user_id, action, metadata)

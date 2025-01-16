@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package log_service;
 
-service LogService {
+service LogServiceBase {
   // Отправка лога
   rpc SendLog (LogMessage) returns (LogResponse) {}
   

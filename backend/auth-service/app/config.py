@@ -17,13 +17,14 @@ class Config:
     # Database Configuration
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL', 
-        'postgresql://user:password@localhost/auth_db'
+        'postgresql://user:password@auth-postgres/auth_db'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Redis Configuration
-    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+    REDIS_HOST = os.getenv('REDIS_HOST', 'auth-redis')
     REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+    REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', '')
     
     # OAuth Configurations
     GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')
@@ -32,8 +33,12 @@ class Config:
     YANDEX_CLIENT_SECRET = os.getenv('YANDEX_CLIENT_SECRET')
 
     # Logging Service Configuration
-    LOG_SERVICE_HOST = os.getenv('LOG_SERVICE_HOST', 'localhost')
-    LOG_SERVICE_PORT = int(os.getenv('LOG_SERVICE_PORT', 50051))
+    LOG_SERVICE_HOST = os.getenv('LOG_SERVICE_HOST', 'log-service')
+    LOG_SERVICE_PORT = int(os.getenv('LOG_SERVICE_PORT', 5100))
+
+    # Name Service Configuration
+    NAME_SERVICE_HOST = os.getenv('NAME_SERVICE_HOST', 'name-service')
+    NAME_SERVICE_PORT = int(os.getenv('NAME_SERVICE_PORT', 5002))
 
     # CORS Configuration
     CORS_ALLOWED_ORIGINS = os.getenv(
