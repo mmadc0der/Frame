@@ -1,0 +1,36 @@
+services:
+  nginx:
+    ports:
+      - "${DEV_HTTP_PORT}:80"
+      - "${DEV_HTTPS_PORT}:443"
+    volumes:
+      - ./frontend:/app/frontend  # Для hot reload в development
+
+  auth-service:
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    volumes:
+      - ./backend/auth-service:/app  # Для hot reload в development
+    ports:
+      - "5001:5001"  # Открываем порт для прямого доступа в development
+
+  name-service:
+    volumes:
+      - ./backend/name-service:/app  # Для hot reload в development
+    ports:
+      - "5002:5002"  # Открываем порт для прямого доступа в development
+
+  log-service:
+    volumes:
+      - ./backend/log-service:/app  # Для hot reload в development
+    ports:
+      - "5100:5100"  # Открываем порт для прямого доступа в development
+
+  postgres:
+    ports:
+      - "5432:5432"  # Открываем порт для доступа к БД в development
+
+  redis:
+    ports:
+      - "6379:6379"  # Открываем порт для доступа к Redis в development
