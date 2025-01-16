@@ -5,10 +5,12 @@ on:
     paths:
       - 'backend/auth-service/**'
       - '.github/workflows/auth-service.yml'
+      - 'backend/log-service/proto/**'
   pull_request:
     paths:
       - 'backend/auth-service/**'
       - '.github/workflows/auth-service.yml'
+      - 'backend/log-service/proto/**'
 
 jobs:
   test:
@@ -61,6 +63,11 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-cov
 
+    - name: Generate proto files
+      run: |
+        cd backend/auth-service
+        python generate_proto.py
+
     - name: Run tests
       env:
         DATABASE_URL: postgresql://test_user:test_password@localhost:5432/auth_test_db
@@ -68,6 +75,10 @@ jobs:
         REDIS_PORT: 6379
         JWT_SECRET_KEY: test_secret_key
         SECRET_KEY: test_app_secret
+        LOG_SERVICE_HOST: localhost
+        LOG_SERVICE_PORT: 5100
+        NAME_SERVICE_HOST: localhost
+        NAME_SERVICE_PORT: 5002
       run: |
         cd backend/auth-service
         export PYTHONPATH=$(pwd)
