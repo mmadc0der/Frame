@@ -56,3 +56,7 @@ env/
 venv/
 ENV/
 .env
+
+# Log Service pb2 files
+log_service_pb2_grpc.py
+log_service_pb2.py
